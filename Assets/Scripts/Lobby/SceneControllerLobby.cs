@@ -15,8 +15,8 @@ public class SceneControllerLobby : SceneController {
 	{
 		base.Start ();
 
-		StartCoroutine (ChattingTest ());
-		StartCoroutine (UpdateRoomListTest ());
+//		StartCoroutine (ChattingTest ());
+//		StartCoroutine (UpdateRoomListTest ());
 	}
 
 	public void OnClickCreateRoom() {
@@ -25,10 +25,11 @@ public class SceneControllerLobby : SceneController {
 
 	public void OnClickCreateRoom2() {
 		JSONObject json = new JSONObject ();
-		json.Add ("target", 3);
+		json.Add ("target", ServerAPITargets.TARGET_CREATE_ROOM);
 		json.Add ("access_token", SocketWrapper.Instance.accessToken);
 		json.Add ("title", InputRoomTitle.value);
 
+		print (json.ToString ());
 		SocketWrapper.Instance.WriteSocket (json.ToString ());
 	}
 
@@ -90,7 +91,9 @@ public class SceneControllerLobby : SceneController {
 			JSONObject jsonData = json.GetObject ("data");
 			UpdateRoomList (jsonData.GetArray ("room_list"));
 		} else if (resultCode == ResultCodes.RESULT_OK_JOIN_ROOM) {
-			Application.LoadLevel("game");
+			Application.LoadLevel ("game");
+		} else if (resultCode == ResultCodes.RESULT_OK_CREATE_ROOM) {
+			Application.LoadLevel ("game");
 		}
 	}
 
