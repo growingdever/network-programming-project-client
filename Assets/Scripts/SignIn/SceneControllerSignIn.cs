@@ -26,8 +26,12 @@ public class SceneControllerSignIn : SceneController {
 	public override void OnMessageReceived() 
 	{
 		string result = SocketWrapper.Instance.Pop ();
-		
 		JSONObject json = JSONObject.Parse(result);
+		if (!json.ContainsKey ("result")) {
+			Debug.LogError("not exist result code");
+			return;
+		}
+
 		if( (int)json.GetNumber("result") == ResultCodes.RESULT_OK_SIGN_IN ) {
 			SocketWrapper.Instance.accessToken = json.GetString("access_token");
 			Application.LoadLevel("lobby");

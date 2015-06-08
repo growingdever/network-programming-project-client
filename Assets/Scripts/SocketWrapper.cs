@@ -17,6 +17,7 @@ public class SocketWrapper : MonoBehaviour
 				container = new GameObject ();  
 				container.name = "SocketWrapper";  
 				instance = container.AddComponent (typeof(SocketWrapper)) as SocketWrapper;  
+				DontDestroyOnLoad(container);
 			}  
 			return instance;  
 		}

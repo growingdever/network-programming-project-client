@@ -11,7 +11,10 @@ public class SceneControllerLobby : SceneController {
 
 	public override void OnMessageReceived() 
 	{
+		JSONObject json = JSONObject.Parse (SocketWrapper.Instance.Pop ());
+//		int resultCode = (int)json.GetNumber ("result");
 
+		print (json);
 	}
 
 }
