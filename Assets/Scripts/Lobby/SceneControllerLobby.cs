@@ -8,6 +8,8 @@ public class SceneControllerLobby : SceneController {
 	public LobbyChattingMessage PrefabChattingMessage;
 	public UIGrid GridGameRoomList;
 	public GameRoomListCell PrefabGameRoomListCell;
+	public UIInput InputRoomTitle;
+
 
 	public override void Start ()
 	{
@@ -15,6 +17,19 @@ public class SceneControllerLobby : SceneController {
 
 		StartCoroutine (ChattingTest ());
 		StartCoroutine (UpdateRoomListTest ());
+	}
+
+	public void OnClickCreateRoom() {
+
+	}
+
+	public void OnClickCreateRoom2() {
+		JSONObject json = new JSONObject ();
+		json.Add ("target", 3);
+		json.Add ("access_token", SocketWrapper.Instance.accessToken);
+		json.Add ("title", InputRoomTitle.value);
+
+		SocketWrapper.Instance.WriteSocket (json.ToString ());
 	}
 
 	IEnumerator ChattingTest() {
