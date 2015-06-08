@@ -28,12 +28,10 @@ public class SceneControllerSignIn : SceneController {
 		string result = SocketWrapper.Instance.Pop ();
 		
 		JSONObject json = JSONObject.Parse(result);
-		if( (int)json.GetNumber("result") == 1001 ) {
+		if( (int)json.GetNumber("result") == ResultCodes.RESULT_OK_SIGN_IN ) {
 			SocketWrapper.Instance.accessToken = json.GetString("access_token");
+			Application.LoadLevel("lobby");
 		}
-		
-		print (result);
-		print (SocketWrapper.Instance.accessToken);
 	}
 
 }
