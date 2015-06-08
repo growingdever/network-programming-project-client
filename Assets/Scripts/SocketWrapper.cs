@@ -29,10 +29,20 @@ public class SocketWrapper : MonoBehaviour
 	String Host = "127.0.0.1";
 	Int32 Port = 10101;
 	internal Boolean socketReady = false;
+	
+	public string accessToken {
+		get;
+		set;
+	}
 
 	public LinkedList<string> messageQueue {
 		get;
 		private set;
+	}
+
+	public Action onMessageReceived {
+		get;
+		set;
 	}
 
 	void Awake ()
@@ -47,6 +57,7 @@ public class SocketWrapper : MonoBehaviour
 		if (socketReady && theStream.DataAvailable) {
 			string read = ReadSocket ();
 			messageQueue.AddLast(read);
+			onMessageReceived();
 		}
 	}
 
@@ -64,6 +75,7 @@ public class SocketWrapper : MonoBehaviour
 			theWriter = new StreamWriter (theStream);
 			theReader = new StreamReader (theStream);
 			socketReady = true;
+			Debug.Log("Socket connected");
 		} catch (Exception e) {
 			Debug.LogError ("Socket error: " + e);
 		}

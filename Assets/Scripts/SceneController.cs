@@ -1,15 +1,22 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class SceneController : MonoBehaviour {
-
-	// Use this for initialization
-	void Start () {
-	
+public class SceneController : MonoBehaviour
+{
+	public virtual void Awake ()
+	{
 	}
-	
-	// Update is called once per frame
-	void Update () {
-	
+
+	public virtual void Start ()
+	{
+		SocketWrapper.Instance.onMessageReceived = this.OnMessageReceived;
+	}
+
+	public virtual void Update ()
+	{
+	}
+
+	public virtual void OnMessageReceived()
+	{
 	}
 }
