@@ -18,6 +18,7 @@ public class SocketWrapper : MonoBehaviour
 				container.name = "SocketWrapper";  
 				instance = container.AddComponent (typeof(SocketWrapper)) as SocketWrapper;  
 				DontDestroyOnLoad(container);
+				Application.runInBackground = true;
 			}  
 			return instance;  
 		}

@@ -1,5 +1,6 @@
 ﻿public class ResultCodes {
 	public const int RESULT_OK_SIGN_IN = 1001;
+	public const int RESULT_OK_CHAT_MESSAGE = 1003;
 	public const int RESULT_OK_CREATE_ROOM = 1004;
 	public const int RESULT_OK_REQUEST_LOBBY_UPDATE = 1005;
 	public const int RESULT_OK_JOIN_ROOM = 1006;
