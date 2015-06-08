@@ -72,8 +72,10 @@ public class SceneControllerLobby : SceneController {
 				AddChattingMessage (jsonMessage);
 			}
 		} else if (resultCode == ResultCodes.RESULT_OK_STATE_LOBBY) {
-			JSONObject jsonData = json.GetObject("data");
-			UpdateRoomList(jsonData.GetArray("room_list"));
+			JSONObject jsonData = json.GetObject ("data");
+			UpdateRoomList (jsonData.GetArray ("room_list"));
+		} else if (resultCode == ResultCodes.RESULT_OK_JOIN_ROOM) {
+			Application.LoadLevel("game");
 		}
 	}
 

@@ -24,8 +24,11 @@ public class GameRoomListCell : MonoBehaviour {
 	}
 
 	public void OnClick() {
-		print ("room clicked : " + roomID);
+		JSONObject json = new JSONObject ();
+		json.Add ("target", 4);
+		json.Add ("access_token", SocketWrapper.Instance.accessToken);
+		json.Add ("room_id", roomID);
+		SocketWrapper.Instance.WriteSocket (json.ToString ());
 	}
-
 
 }
