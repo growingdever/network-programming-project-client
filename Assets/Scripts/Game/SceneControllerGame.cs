@@ -6,6 +6,8 @@ public class SceneControllerGame : SceneController {
 
 	public UIInput InputChattingMessage;
 	public UILabel LabelTitle;
+	public UILabel LabelGameStart;
+
 
 	public override void Start ()
 	{
@@ -45,6 +47,8 @@ public class SceneControllerGame : SceneController {
 	}
 
 	public void OnClickGameStart() {
+		LabelGameStart.GetComponent<Animator> ().Play ("Dismiss");
+
 		JSONObject json = new JSONObject ();
 		json.Add ("target", ServerAPITargets.TARGET_GAME_START);
 		json.Add ("access_token", SocketWrapper.Instance.accessToken);
@@ -75,6 +79,8 @@ public class SceneControllerGame : SceneController {
 	IEnumerator InitTitleWithDelay(float delay) {
 		yield return new WaitForSeconds (delay);
 		LabelTitle.text = "Let\'s start a game...";
+
+		LabelGameStart.GetComponent<Animator> ().Play ("Show");
 	}
 
 }
