@@ -7,7 +7,9 @@ public class SceneControllerGame : SceneController {
 	public UIInput InputChattingMessage;
 	public UILabel LabelTitle;
 	public UILabel LabelGameStart;
+	public UILabel LabelTimer;
 	public User[] Users;
+	int numOfUser;
 
 
 	public override void Awake ()
@@ -50,19 +52,47 @@ public class SceneControllerGame : SceneController {
 		jsonData.Add ("user_list", userList);
 
 		SocketWrapper.Instance.messageQueue.AddLast (jsonRoomState.ToString());
+		SocketWrapper.Instance.onMessageReceived ();
+
+		JSONObject jsonGameStart = new JSONObject ();
+		jsonGameStart.Add ("result", ResultCodes.RESULT_OK_NOTIFYING_START_GAME);
+		SocketWrapper.Instance.messageQueue.AddLast (jsonGameStart.ToString());
+		SocketWrapper.Instance.onMessageReceived ();
 
 
-		while (true) {
-			JSONObject json2 = new JSONObject();
-			json2.Add("result", 1012);
-			json2.Add("winner_id", "testuser1");
-			json2.Add("remain_round", 9);
-			SocketWrapper.Instance.messageQueue.AddLast(json2.ToString());
+		for( int i = 0; i < 5; i ++ ) {
+			JSONObject json;
+
+
+			json = GetTestJSONRoundStart();
+			SocketWrapper.Instance.messageQueue.AddLast(json.ToString());
 			SocketWrapper.Instance.onMessageReceived();
-			print (json2);
+			yield return new WaitForSeconds(5.0f);
 
+
+			json = GetTestJSONRoundResult();
+			SocketWrapper.Instance.messageQueue.AddLast(json.ToString());
+			SocketWrapper.Instance.onMessageReceived();
 			yield return new WaitForSeconds(3.0f);
 		}
+	}
+
+	JSONObject GetTestJSONRoundStart() {
+		JSONObject json = new JSONObject();
+		json.Add("result", ResultCodes.RESULT_OK_MAKE_QUIZ);
+		json.Add("quiz_string", "test test");
+		json.Add("time", 5.0f);
+		
+		return json;
+	}
+
+	JSONObject GetTestJSONRoundResult() {
+		JSONObject json = new JSONObject();
+		json.Add("result", ResultCodes.RESULT_OK_ROUND_RESULT);
+		json.Add("winner_id", "testuser" + Random.Range(1, 3));
+		json.Add("remain_round", 9);
+
+		return json;
 	}
 
 	public override void OnMessageReceived() 
@@ -79,10 +109,9 @@ public class SceneControllerGame : SceneController {
 			UpdateGameRoom (json);
 			break;
 		case ResultCodes.RESULT_OK_START_GAME:
-			LabelGameStart.GetComponent<Animator> ().Play ("Dismiss");
 			break;
 		case ResultCodes.RESULT_OK_NOTIFYING_START_GAME:
-			LabelGameStart.GetComponent<Animator> ().Play ("Dismiss");
+			StartGame ();
 			break;
 		case ResultCodes.RESULT_OK_MAKE_QUIZ:
 			UpdateQuiz (json);
@@ -122,21 +151,24 @@ public class SceneControllerGame : SceneController {
 		json.Add ("target", ServerAPITargets.TARGET_GAME_START);
 		json.Add ("access_token", SocketWrapper.Instance.accessToken);
 		SocketWrapper.Instance.WriteSocket (json.ToString ());
+	}
 
-		for (int i = 0; i < Users.Length; i ++) {
-			Users[i].ShowMedalIf("");
-		}
+	void StartGame() {
+		LabelGameStart.GetComponent<Animator> ().Play ("Dismiss");
+		LabelTitle.text = "Game is starting soon!";
+		LabelTimer.GetComponent<Animator> ().Play ("TimerShow");
 	}
 
 	void UpdateGameRoom(JSONObject json) {
 		JSONObject jsonData = json.GetObject ("data");
 		JSONArray jsonUserList = jsonData.GetArray ("user_list");
-		for (int i = 0; i < jsonUserList.Length; i ++) {
+		numOfUser = jsonUserList.Length;
+		for (int i = 0; i < numOfUser; i ++) {
 			JSONObject jsonUser = jsonUserList[i].Obj;
 			Users[i].gameObject.SetActive(true);
 			Users[i].Init(jsonUser);
 		}
-		for (int i = jsonUserList.Length; i < 4; i ++) {
+		for (int i = numOfUser; i < 4; i ++) {
 			Users[i].gameObject.SetActive(false);
 		}
 	}
@@ -150,6 +182,16 @@ public class SceneControllerGame : SceneController {
 
 	void UpdateQuiz(JSONObject json) {
 		LabelTitle.text = json.GetString ("quiz_string");
+
+		int time = (int)json.GetNumber ("time");
+		StartCoroutine (TimerStart (time));
+	}
+
+	IEnumerator TimerStart(int time) {
+		for( int i = time; i >= 0; i -- ) {
+			LabelTimer.text = string.Format ("{0}", i);
+			yield return new WaitForSeconds(1.0f);
+		}
 	}
 
 	void ShowRoundResult(JSONObject json) {
@@ -168,6 +210,8 @@ public class SceneControllerGame : SceneController {
 	void ShowTotalResult(JSONObject json) {
 		string winnerID = json.GetString ("winner_id");
 		LabelTitle.text = string.Format ("Final winner is {0}!", winnerID);
+
+		LabelTimer.GetComponent<Animator> ().Play ("TimerDismiss");
 
 		StartCoroutine (InitTitleWithDelay (3.0f));
 	}
