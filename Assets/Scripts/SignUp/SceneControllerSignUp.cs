@@ -2,10 +2,16 @@
 using System.Collections;
 using Boomlagoon.JSON;
 
-public class SceneControllerSignIn : SceneController {
+public class SceneControllerSignUp : SceneController {
 
 	public UIInput InputID;
 	public UIInput InputPassword;
+	public GameObject AuraEffect;
+
+	public int characterType {
+		get;
+		set;
+	}
 
 
 	public override void Start ()
@@ -13,19 +19,16 @@ public class SceneControllerSignIn : SceneController {
 		base.Start ();
 	}
 
-	public void OnClickSignIn() 
-	{
-		JSONObject json = new JSONObject ();
-		json.Add ("target", 1);
-		json.Add ("id", InputID.value);
-		json.Add ("password", InputPassword.value);
-
-		SocketWrapper.Instance.WriteSocket (json.ToString());
-	}
-
 	public void OnClickSignUp() 
 	{
-		Application.LoadLevel ("signup");
+		JSONObject json = new JSONObject ();
+		json.Add ("target", ServerAPITargets.TARGET_SIGNUP);
+		json.Add ("id", InputID.value);
+		json.Add ("password", InputPassword.value);
+		json.Add ("character_type", characterType);
+
+		print (json.ToString ());
+		SocketWrapper.Instance.WriteSocket (json.ToString());
 	}
 
 	public override void OnMessageReceived() 
@@ -37,9 +40,8 @@ public class SceneControllerSignIn : SceneController {
 			return;
 		}
 
-		if( (int)json.GetNumber("result") == ResultCodes.RESULT_OK_SIGN_IN ) {
-			SocketWrapper.Instance.accessToken = json.GetString("access_token");
-			Application.LoadLevel("lobby");
+		if( (int)json.GetNumber("result") == ResultCodes.RESULT_OK_SIGN_UP ) {
+			Application.LoadLevel("login");
 		}
 	}
 
