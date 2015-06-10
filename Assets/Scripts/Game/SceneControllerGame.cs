@@ -37,18 +37,34 @@ public class SceneControllerGame : SceneController {
 		}
 		
 		int resultCode = (int)json.GetNumber ("result");
-		if (resultCode == ResultCodes.RESULT_OK_STATE_GAME_ROOM) {
+		switch (resultCode) {
+		case ResultCodes.RESULT_OK_STATE_GAME_ROOM:
 			UpdateGameRoom (json);
-		} else if (resultCode == ResultCodes.RESULT_OK_MAKE_QUIZ) {
+			break;
+		case ResultCodes.RESULT_OK_START_GAME:
+			break;
+		case ResultCodes.RESULT_OK_NOTIFYING_START_GAME:
+			LabelGameStart.GetComponent<Animator> ().Play ("Dismiss");
+			break;
+		case ResultCodes.RESULT_OK_MAKE_QUIZ:
 			UpdateQuiz (json);
-		} else if (resultCode == ResultCodes.RESULT_OK_ROUND_RESULT) {
+			break;
+		case ResultCodes.RESULT_OK_ROUND_RESULT:
 			ShowRoundResult (json);
-		} else if (resultCode == ResultCodes.RESULT_OK_TOTAL_RESULT) {
+			break;
+		case ResultCodes.RESULT_OK_TOTAL_RESULT:
 			ShowTotalResult (json);
-		} else if (resultCode == ResultCodes.RESULT_OK_REQUEST_ROOM_MEMBER_UPDATE) {
+			break;
+		case ResultCodes.RESULT_OK_REQUEST_ROOM_MEMBER_UPDATE:
 			SendRequestRoomMemberUpdate ();
-		} else if (resultCode == ResultCodes.RESULT_OK_CHAT_MESSAGE) {
-			ReceiveChatMessage(json);
+			break;
+		case ResultCodes.RESULT_OK_CHAT_MESSAGE:
+			ReceiveChatMessage (json);
+			break;
+		case ResultCodes.RESULT_ERROR_INVALID_CONNECTION:
+		default:
+			Application.LoadLevel("login");
+			break;
 		}
 	}
 
@@ -64,8 +80,6 @@ public class SceneControllerGame : SceneController {
 	}
 
 	public void OnClickGameStart() {
-		LabelGameStart.GetComponent<Animator> ().Play ("Dismiss");
-
 		JSONObject json = new JSONObject ();
 		json.Add ("target", ServerAPITargets.TARGET_GAME_START);
 		json.Add ("access_token", SocketWrapper.Instance.accessToken);

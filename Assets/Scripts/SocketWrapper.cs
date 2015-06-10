@@ -31,7 +31,8 @@ public class SocketWrapper : MonoBehaviour
 	String Host = "127.0.0.1";
 	Int32 Port = 10101;
 	internal Boolean socketReady = false;
-	
+
+	string _accessToken = "";
 	public string accessToken {
 		get;
 		set;
