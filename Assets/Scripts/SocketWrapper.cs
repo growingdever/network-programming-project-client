@@ -52,15 +52,25 @@ public class SocketWrapper : MonoBehaviour
 		SetUpSocket ();
 
 		messageQueue = new LinkedList<string> ();
+
+		StartCoroutine (CheckSocket ());
+	}
+
+	IEnumerator CheckSocket() {
+		while (true) {
+			if (socketReady && theStream.DataAvailable) {
+				string read = ReadSocket ();
+				messageQueue.AddLast(read);
+				onMessageReceived();
+			}
+
+			yield return new WaitForFixedUpdate();
+		}
 	}
 
 	void Update ()
 	{
-		if (socketReady && theStream.DataAvailable) {
-			string read = ReadSocket ();
-			messageQueue.AddLast(read);
-			onMessageReceived();
-		}
+
 	}
 
 	public string Pop() {

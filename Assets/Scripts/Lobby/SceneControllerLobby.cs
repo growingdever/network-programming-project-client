@@ -29,7 +29,6 @@ public class SceneControllerLobby : SceneController {
 		json.Add ("access_token", SocketWrapper.Instance.accessToken);
 		json.Add ("title", InputRoomTitle.value);
 
-		print (json.ToString ());
 		SocketWrapper.Instance.WriteSocket (json.ToString ());
 	}
 

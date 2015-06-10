@@ -7,6 +7,7 @@ public class SceneControllerGame : SceneController {
 	public UIInput InputChattingMessage;
 	public UILabel LabelTitle;
 	public UILabel LabelGameStart;
+	public User[] Users;
 
 
 	public override void Start ()
@@ -14,25 +15,32 @@ public class SceneControllerGame : SceneController {
 		base.Start ();
 
 		LabelTitle.text = "Let\'s start a game...";
+
+		SendRequestRoomMemberUpdate ();
 	}
 
 	public override void OnMessageReceived() 
 	{
 		JSONObject json = JSONObject.Parse (SocketWrapper.Instance.Pop ());
+		print (json);
 		if (!json.ContainsKey ("result")) {
 			return;
 		}
 		
 		int resultCode = (int)json.GetNumber ("result");
 		if (resultCode == ResultCodes.RESULT_OK_STATE_GAME_ROOM) {
-			UpdateGameRoom(json);
+			UpdateGameRoom (json);
 		} else if (resultCode == ResultCodes.RESULT_OK_MAKE_QUIZ) {
 			UpdateQuiz (json);
 		} else if (resultCode == ResultCodes.RESULT_OK_ROUND_RESULT) {
 			ShowRoundResult (json);
 		} else if (resultCode == ResultCodes.RESULT_OK_TOTAL_RESULT) {
 			ShowTotalResult (json);
-		} 
+		} else if (resultCode == ResultCodes.RESULT_OK_REQUEST_ROOM_MEMBER_UPDATE) {
+			SendRequestRoomMemberUpdate ();
+		} else if (resultCode == ResultCodes.RESULT_OK_CHAT_MESSAGE) {
+			ReceiveChatMessage(json);
+		}
 	}
 
 	public void OnChattingMessageSubmit() {
@@ -56,7 +64,22 @@ public class SceneControllerGame : SceneController {
 	}
 
 	void UpdateGameRoom(JSONObject json) {
+		JSONObject jsonData = json.GetObject ("data");
+		JSONArray jsonUserList = jsonData.GetArray ("user_list");
+		for (int i = 0; i < jsonUserList.Length; i ++) {
+			JSONObject jsonUser = jsonUserList[i].Obj;
+			Users[i].Init(jsonUser);
+		}
+		for (int i = jsonUserList.Length; i < 4; i ++) {
+			Users[i].gameObject.SetActive(false);
+		}
+	}
 
+	void SendRequestRoomMemberUpdate() {
+		JSONObject json = new JSONObject ();
+		json.Add ("target", ServerAPITargets.TARGET_CHECK_ROOM);
+		json.Add ("access_token", SocketWrapper.Instance.accessToken);
+		SocketWrapper.Instance.WriteSocket (json.ToString ());
 	}
 
 	void UpdateQuiz(JSONObject json) {
@@ -83,4 +106,13 @@ public class SceneControllerGame : SceneController {
 		LabelGameStart.GetComponent<Animator> ().Play ("Show");
 	}
 
+	void ReceiveChatMessage(JSONObject json) {
+		JSONObject jsonMessage = json.GetObject ("message");
+		string senderID = jsonMessage.GetString ("sender_id");
+		string content = jsonMessage.GetString ("content");
+
+		for( int i = 0; i < Users.Length; i ++ ) {
+			Users[i].SetMessageIf(senderID, content);
+		}
+	}
 }
