@@ -19,6 +19,8 @@ public class User : MonoBehaviour {
 
 		LabelUserID.text = string.Format ("Lv.{0} {1}", level, userID);
 		SpriteCharacter.spriteName = string.Format ("character{0}", characterType);
+
+		DismissBalloon ();
 	}
 
 	public void SetMessageIf(string userID, string msg) {
@@ -34,7 +36,7 @@ public class User : MonoBehaviour {
 
 	public void ShowBalloon() {
 		SpriteBalloon.gameObject.SetActive(true);
-		Invoke ("DismissBalloon", 2.0f);
+		Invoke ("DismissBalloon", 3.0f);
 	}
 
 	public void DismissBalloon() {

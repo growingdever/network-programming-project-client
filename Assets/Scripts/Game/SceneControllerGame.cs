@@ -10,6 +10,15 @@ public class SceneControllerGame : SceneController {
 	public User[] Users;
 
 
+	public override void Awake ()
+	{
+		base.Awake ();
+
+		for (int i = 0; i < Users.Length; i++) {
+			Users[i].gameObject.SetActive(false);
+		}
+	}
+
 	public override void Start ()
 	{
 		base.Start ();
@@ -68,6 +77,7 @@ public class SceneControllerGame : SceneController {
 		JSONArray jsonUserList = jsonData.GetArray ("user_list");
 		for (int i = 0; i < jsonUserList.Length; i ++) {
 			JSONObject jsonUser = jsonUserList[i].Obj;
+			Users[i].gameObject.SetActive(true);
 			Users[i].Init(jsonUser);
 		}
 		for (int i = jsonUserList.Length; i < 4; i ++) {
