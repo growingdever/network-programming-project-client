@@ -25,7 +25,44 @@ public class SceneControllerGame : SceneController {
 
 		LabelTitle.text = "Let\'s start a game...";
 
-		SendRequestRoomMemberUpdate ();
+		SocketWrapper.Instance.accessToken = "user0";
+
+//		SendRequestRoomMemberUpdate ();
+		StartCoroutine (TestRoundWinner ());
+	}
+
+	IEnumerator TestRoundWinner() {
+		JSONObject jsonRoomState = new JSONObject();
+		jsonRoomState.Add("result", 1015);
+
+		JSONObject jsonData = new JSONObject ();
+		jsonData.Add ("room_id", 1);
+		jsonRoomState.Add ("data", jsonData);
+
+		JSONArray userList = new JSONArray ();
+		for (int i = 1; i <= 2; i ++) {
+			JSONObject jsonUser = new JSONObject();
+			jsonUser.Add("user_id", "testuser" + i);
+			jsonUser.Add("character_type", i);
+			jsonUser.Add("level", i * 3);
+			userList.Add (jsonUser);
+		}
+		jsonData.Add ("user_list", userList);
+
+		SocketWrapper.Instance.messageQueue.AddLast (jsonRoomState.ToString());
+
+
+		while (true) {
+			JSONObject json2 = new JSONObject();
+			json2.Add("result", 1012);
+			json2.Add("winner_id", "testuser1");
+			json2.Add("remain_round", 9);
+			SocketWrapper.Instance.messageQueue.AddLast(json2.ToString());
+			SocketWrapper.Instance.onMessageReceived();
+			print (json2);
+
+			yield return new WaitForSeconds(3.0f);
+		}
 	}
 
 	public override void OnMessageReceived() 
@@ -42,6 +79,7 @@ public class SceneControllerGame : SceneController {
 			UpdateGameRoom (json);
 			break;
 		case ResultCodes.RESULT_OK_START_GAME:
+			LabelGameStart.GetComponent<Animator> ().Play ("Dismiss");
 			break;
 		case ResultCodes.RESULT_OK_NOTIFYING_START_GAME:
 			LabelGameStart.GetComponent<Animator> ().Play ("Dismiss");
@@ -84,6 +122,10 @@ public class SceneControllerGame : SceneController {
 		json.Add ("target", ServerAPITargets.TARGET_GAME_START);
 		json.Add ("access_token", SocketWrapper.Instance.accessToken);
 		SocketWrapper.Instance.WriteSocket (json.ToString ());
+
+		for (int i = 0; i < Users.Length; i ++) {
+			Users[i].ShowMedalIf("");
+		}
 	}
 
 	void UpdateGameRoom(JSONObject json) {
@@ -113,7 +155,14 @@ public class SceneControllerGame : SceneController {
 	void ShowRoundResult(JSONObject json) {
 		string winnerID = json.GetString ("winner_id");
 		int remainRound = (int)json.GetNumber ("remain_round");
-		LabelTitle.text = string.Format ("{0} is win on this round!\n{1} round is left...", winnerID, remainRound);
+		if (winnerID == "") {
+			LabelTitle.text = string.Format ("There isn\'t winner!\n{0} round is left...", remainRound);
+		} else {
+			LabelTitle.text = string.Format ("{0} is win on this round!\n{1} round is left...", winnerID, remainRound);
+			for( int i = 0; i < Users.Length; i ++ ) {
+				Users[i].ShowMedalIf(winnerID);
+			}
+		}
 	}
 
 	void ShowTotalResult(JSONObject json) {

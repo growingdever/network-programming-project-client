@@ -8,6 +8,7 @@ public class User : MonoBehaviour {
 	public UISprite SpriteCharacter;
 	public UISprite SpriteBalloon;
 	public UILabel LabelMessage;
+	public UISprite SpriteMedal;
 
 	string userID;
 
@@ -21,6 +22,7 @@ public class User : MonoBehaviour {
 		SpriteCharacter.spriteName = string.Format ("character{0}", characterType);
 
 		DismissBalloon ();
+		DismissMedal ();
 	}
 
 	public void SetMessageIf(string userID, string msg) {
@@ -41,6 +43,18 @@ public class User : MonoBehaviour {
 
 	public void DismissBalloon() {
 		SpriteBalloon.gameObject.SetActive(false);
+	}
+
+	public void ShowMedalIf(string userID) {
+		if( this.userID == userID ) {
+			SpriteMedal.gameObject.SetActive (true);
+			SpriteMedal.GetComponent<Animator>().Play("MedalShow");
+			Invoke("DismissMedal", 1.5f);
+		}
+	}
+
+	public void DismissMedal() {
+		SpriteMedal.gameObject.SetActive (false);
 	}
 
 }
