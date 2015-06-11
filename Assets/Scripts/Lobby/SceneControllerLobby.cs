@@ -24,6 +24,10 @@ public class SceneControllerLobby : SceneController {
 //		StartCoroutine (UpdateRoomListTest ());
 	}
 
+	void RequestCheckingLobby() {
+
+	}
+
 	public void OnClickCreateRoom() {
 		DialogCreateRoom.GetComponent<Animator> ().Play ("Show");
 		DialogBackBlock.gameObject.SetActive (true);
