@@ -8,7 +8,12 @@ public class SceneControllerLobby : SceneController {
 	public LobbyChattingMessage PrefabChattingMessage;
 	public UIGrid GridGameRoomList;
 	public GameRoomListCell PrefabGameRoomListCell;
+	public UIGrid GridConnectedUserList;
+	public ConnectedUserListCell PrefabConnectedUserListCell;
+	public Transform DialogCreateRoom;
+	public Transform DialogBackBlock;
 	public UIInput InputRoomTitle;
+	public UIInput InputChattingMessage;
 
 
 	public override void Start ()
@@ -20,7 +25,8 @@ public class SceneControllerLobby : SceneController {
 	}
 
 	public void OnClickCreateRoom() {
-
+		DialogCreateRoom.GetComponent<Animator> ().Play ("Show");
+		DialogBackBlock.gameObject.SetActive (true);
 	}
 
 	public void OnClickCreateRoom2() {
@@ -28,8 +34,14 @@ public class SceneControllerLobby : SceneController {
 		json.Add ("target", ServerAPITargets.TARGET_CREATE_ROOM);
 		json.Add ("access_token", SocketWrapper.Instance.accessToken);
 		json.Add ("title", InputRoomTitle.value);
-
 		SocketWrapper.Instance.WriteSocket (json.ToString ());
+
+		DialogCreateRoom.GetComponent<Animator> ().Play ("Dismiss");
+		DialogBackBlock.gameObject.SetActive (false);
+	}
+
+	public void OnSubmitChattingMessage() {
+
 	}
 
 	IEnumerator ChattingTest() {
@@ -88,7 +100,7 @@ public class SceneControllerLobby : SceneController {
 			}
 		} else if (resultCode == ResultCodes.RESULT_OK_STATE_LOBBY) {
 			JSONObject jsonData = json.GetObject ("data");
-			UpdateRoomList (jsonData.GetArray ("room_list"));
+			UpdateLobby(jsonData);
 		} else if (resultCode == ResultCodes.RESULT_OK_JOIN_ROOM) {
 			Application.LoadLevel ("game");
 		} else if (resultCode == ResultCodes.RESULT_OK_CREATE_ROOM) {
@@ -111,18 +123,37 @@ public class SceneControllerLobby : SceneController {
 		}
 	}
 
-	void UpdateRoomList(JSONArray jsonRoomArray) {
+	void UpdateLobby(JSONObject json) {
+		UpdateRoomList (json.GetArray ("room_list"));
+		UpdateUserList (json.GetArray ("user_list"));
+	}
+
+	void UpdateRoomList(JSONArray jsonArray) {
 		foreach(Transform child in GridGameRoomList.transform) {
 			Destroy(child.gameObject);
 		}
 		GridGameRoomList.transform.DetachChildren ();
 
-		foreach(JSONValue jsonValue in jsonRoomArray) {
+		foreach(JSONValue jsonValue in jsonArray) {
 			GameObject clone = NGUITools.AddChild(GridGameRoomList.gameObject, PrefabGameRoomListCell.gameObject);
 			clone.GetComponent<GameRoomListCell>().UpdateInformation(jsonValue.Obj);
 		}
 		GridGameRoomList.Reposition ();
-		GridGameRoomList.transform.localPosition = new Vector3 (-395, 106, 0);
+		GridGameRoomList.transform.localPosition = new Vector3 (-338, 141, 0);
+	}
+
+	void UpdateUserList(JSONArray jsonArray) {
+		foreach(Transform child in GridConnectedUserList.transform) {
+			Destroy(child.gameObject);
+		}
+		GridConnectedUserList.transform.DetachChildren ();
+		
+		foreach(JSONValue jsonValue in jsonArray) {
+			GameObject clone = NGUITools.AddChild(GridConnectedUserList.gameObject, PrefabConnectedUserListCell.gameObject);
+			clone.GetComponent<ConnectedUserListCell>().UpdateInformation(jsonValue.Obj);
+		}
+		GridConnectedUserList.Reposition ();
+		GridConnectedUserList.transform.localPosition = new Vector3 (-194, 137, 0);
 	}
 
 }

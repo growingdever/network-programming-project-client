@@ -7,6 +7,8 @@ public class GameRoomListCell : MonoBehaviour {
 	public UILabel LabelTitle;
 	public UILabel LabelStatus;
 	public UILabel LabelMemberCount;
+	public Color StatusColorWaiting;
+	public Color StatusColorPlaying;
 
 	int roomID;
 
@@ -18,8 +20,10 @@ public class GameRoomListCell : MonoBehaviour {
 		int status = (int)json.GetNumber ("state");
 		if (status == 0) {
 			LabelStatus.text = "READY";
+			LabelStatus.color = StatusColorWaiting;
 		} else if (status == 1) {
 			LabelStatus.text = "PLAYING";
+			LabelStatus.color = StatusColorPlaying;
 		}
 	}
 
