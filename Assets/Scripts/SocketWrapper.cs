@@ -19,7 +19,8 @@ public class SocketWrapper : MonoBehaviour
 				instance = container.AddComponent (typeof(SocketWrapper)) as SocketWrapper;  
 				DontDestroyOnLoad(container);
 				Application.runInBackground = true;
-			}  
+			}
+
 			return instance;  
 		}
 	}
@@ -31,8 +32,7 @@ public class SocketWrapper : MonoBehaviour
 	String Host = "127.0.0.1";
 	Int32 Port = 10101;
 	internal Boolean socketReady = false;
-
-	string _accessToken = "";
+	
 	public string accessToken {
 		get;
 		set;
@@ -50,11 +50,8 @@ public class SocketWrapper : MonoBehaviour
 
 	void Awake ()
 	{
-		SetUpSocket ();
-
 		messageQueue = new LinkedList<string> ();
-
-		StartCoroutine (CheckSocket ());
+		SetUpSocket ();
 	}
 
 	IEnumerator CheckSocket() {
@@ -89,6 +86,8 @@ public class SocketWrapper : MonoBehaviour
 			theReader = new StreamReader (theStream);
 			socketReady = true;
 			Debug.Log("Socket connected");
+			Application.LoadLevel("login");
+			StartCoroutine (CheckSocket ());
 		} catch (Exception e) {
 			Debug.LogError ("Socket error: " + e);
 		}

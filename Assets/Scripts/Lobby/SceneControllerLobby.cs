@@ -48,7 +48,13 @@ public class SceneControllerLobby : SceneController {
 	}
 
 	public void OnSubmitChattingMessage() {
+		JSONObject json = new JSONObject ();
+		json.Add ("target", ServerAPITargets.TARGET_CHATTING);
+		json.Add ("access_token", SocketWrapper.Instance.accessToken);
+		json.Add ("message", InputChattingMessage.value);
+		SocketWrapper.Instance.WriteSocket (json.ToString ());
 
+		InputChattingMessage.value = "";
 	}
 
 	IEnumerator ChattingTest() {
