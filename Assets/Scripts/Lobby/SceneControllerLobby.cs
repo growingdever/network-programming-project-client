@@ -22,11 +22,13 @@ public class SceneControllerLobby : SceneController {
 
 //		StartCoroutine (ChattingTest ());
 //		StartCoroutine (UpdateRoomListTest ());
+
+		RequestCheckingLobby ();
 	}
 
 	void RequestCheckingLobby() {
 		JSONObject json = new JSONObject ();
-		json.Add ("target", ServerAPITargets.TARGET_CHECK_ROOM);
+		json.Add ("target", ServerAPITargets.TARGET_CHECK_LOBBY);
 		json.Add ("access_token", SocketWrapper.Instance.accessToken);
 		SocketWrapper.Instance.WriteSocket (json.ToString ());
 	}
@@ -104,6 +106,7 @@ public class SceneControllerLobby : SceneController {
 		if (!json.ContainsKey ("result")) {
 			return;
 		}
+		print (json);
 
 		int resultCode = (int)json.GetNumber ("result");
 		if (resultCode == ResultCodes.RESULT_OK_CHAT_MESSAGE) {
