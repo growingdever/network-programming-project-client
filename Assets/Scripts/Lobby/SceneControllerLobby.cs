@@ -25,7 +25,10 @@ public class SceneControllerLobby : SceneController {
 	}
 
 	void RequestCheckingLobby() {
-
+		JSONObject json = new JSONObject ();
+		json.Add ("target", ServerAPITargets.TARGET_CHECK_ROOM);
+		json.Add ("access_token", SocketWrapper.Instance.accessToken);
+		SocketWrapper.Instance.WriteSocket (json.ToString ());
 	}
 
 	public void OnClickCreateRoom() {

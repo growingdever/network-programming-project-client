@@ -6,7 +6,8 @@ public class SceneControllerGame : SceneController {
 
 	public UIInput InputChattingMessage;
 	public UILabel LabelTitle;
-	public UILabel LabelGameStart;
+	public UIButton ButtonStartGame;
+	public UIButton ButtonLeaveGame;
 	public UILabel LabelTimer;
 	public User[] Users;
 	int numOfUser;
@@ -30,7 +31,6 @@ public class SceneControllerGame : SceneController {
 		SocketWrapper.Instance.accessToken = "user0";
 
 //		SendRequestRoomMemberUpdate ();
-		StartCoroutine (TestRoundWinner ());
 	}
 
 	IEnumerator TestRoundWinner() {
@@ -128,6 +128,9 @@ public class SceneControllerGame : SceneController {
 		case ResultCodes.RESULT_OK_CHAT_MESSAGE:
 			ReceiveChatMessage (json);
 			break;
+		case ResultCodes.RESULT_OK_LEAVE_ROOM:
+			LeaveGameRoom();
+			break;
 		case ResultCodes.RESULT_ERROR_INVALID_CONNECTION:
 		default:
 			Application.LoadLevel("login");
@@ -151,12 +154,33 @@ public class SceneControllerGame : SceneController {
 		json.Add ("target", ServerAPITargets.TARGET_GAME_START);
 		json.Add ("access_token", SocketWrapper.Instance.accessToken);
 		SocketWrapper.Instance.WriteSocket (json.ToString ());
+
+		StartCoroutine (TestRoundWinner ());
+	}
+
+	public void OnClickLeaveGame() {
+		JSONObject json = new JSONObject ();
+		json.Add ("target", ServerAPITargets.TARGET_LEAVE_GAME_ROOM);
+		json.Add ("access_token", SocketWrapper.Instance.accessToken);
+		SocketWrapper.Instance.WriteSocket (json.ToString ());
 	}
 
 	void StartGame() {
-		LabelGameStart.GetComponent<Animator> ().Play ("Dismiss");
+		ButtonStartGame.GetComponent<Animator> ().Play ("Dismiss");
+		ButtonLeaveGame.GetComponent<Animator> ().Play ("Dismiss");
+
 		LabelTitle.text = "Game is starting soon!";
 		LabelTimer.GetComponent<Animator> ().Play ("TimerShow");
+	}
+
+	void LeaveGameRoom() {
+		ButtonStartGame.GetComponent<Animator> ().Play ("Dismiss");
+		ButtonLeaveGame.GetComponent<Animator> ().Play ("Dismiss");
+		Invoke ("LeaveGameRoom2", 1.5f);
+	}
+
+	void LeaveGameRoom2() {
+		Application.LoadLevel ("lobby");
 	}
 
 	void UpdateGameRoom(JSONObject json) {
@@ -220,7 +244,8 @@ public class SceneControllerGame : SceneController {
 		yield return new WaitForSeconds (delay);
 		LabelTitle.text = "Let\'s start a game...";
 
-		LabelGameStart.GetComponent<Animator> ().Play ("Show");
+		ButtonStartGame.GetComponent<Animator> ().Play ("Show");
+		ButtonLeaveGame.GetComponent<Animator> ().Play ("Show");
 	}
 
 	void ReceiveChatMessage(JSONObject json) {
