@@ -11,7 +11,6 @@ public class SceneControllerLobby : SceneController {
 	public UIGrid GridConnectedUserList;
 	public ConnectedUserListCell PrefabConnectedUserListCell;
 	public Transform DialogCreateRoom;
-	public Transform DialogBackBlock;
 	public UIInput InputRoomTitle;
 	public UIInput InputChattingMessage;
 
@@ -35,7 +34,6 @@ public class SceneControllerLobby : SceneController {
 
 	public void OnClickCreateRoom() {
 		DialogCreateRoom.GetComponent<Animator> ().Play ("Show");
-		DialogBackBlock.gameObject.SetActive (true);
 	}
 
 	public void OnClickCreateRoom2() {
@@ -46,7 +44,6 @@ public class SceneControllerLobby : SceneController {
 		SocketWrapper.Instance.WriteSocket (json.ToString ());
 
 		DialogCreateRoom.GetComponent<Animator> ().Play ("Dismiss");
-		DialogBackBlock.gameObject.SetActive (false);
 	}
 
 	public void OnSubmitChattingMessage() {

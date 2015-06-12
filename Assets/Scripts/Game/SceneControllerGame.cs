@@ -28,72 +28,70 @@ public class SceneControllerGame : SceneController {
 
 		LabelTitle.text = "Let\'s start a game...";
 
-		SocketWrapper.Instance.accessToken = "user0";
-
-//		SendRequestRoomMemberUpdate ();
+		SendRequestRoomMemberUpdate ();
 	}
 
-	IEnumerator TestRoundWinner() {
-		JSONObject jsonRoomState = new JSONObject();
-		jsonRoomState.Add("result", 1015);
-
-		JSONObject jsonData = new JSONObject ();
-		jsonData.Add ("room_id", 1);
-		jsonRoomState.Add ("data", jsonData);
-
-		JSONArray userList = new JSONArray ();
-		for (int i = 1; i <= 2; i ++) {
-			JSONObject jsonUser = new JSONObject();
-			jsonUser.Add("user_id", "testuser" + i);
-			jsonUser.Add("character_type", i);
-			jsonUser.Add("level", i * 3);
-			userList.Add (jsonUser);
-		}
-		jsonData.Add ("user_list", userList);
-
-		SocketWrapper.Instance.messageQueue.AddLast (jsonRoomState.ToString());
-		SocketWrapper.Instance.onMessageReceived ();
-
-		JSONObject jsonGameStart = new JSONObject ();
-		jsonGameStart.Add ("result", ResultCodes.RESULT_OK_NOTIFYING_START_GAME);
-		SocketWrapper.Instance.messageQueue.AddLast (jsonGameStart.ToString());
-		SocketWrapper.Instance.onMessageReceived ();
-
-
-		for( int i = 0; i < 5; i ++ ) {
-			JSONObject json;
-
-
-			json = GetTestJSONRoundStart();
-			SocketWrapper.Instance.messageQueue.AddLast(json.ToString());
-			SocketWrapper.Instance.onMessageReceived();
-			yield return new WaitForSeconds(5.0f);
-
-
-			json = GetTestJSONRoundResult();
-			SocketWrapper.Instance.messageQueue.AddLast(json.ToString());
-			SocketWrapper.Instance.onMessageReceived();
-			yield return new WaitForSeconds(3.0f);
-		}
-	}
-
-	JSONObject GetTestJSONRoundStart() {
-		JSONObject json = new JSONObject();
-		json.Add("result", ResultCodes.RESULT_OK_MAKE_QUIZ);
-		json.Add("quiz_string", "test test");
-		json.Add("time", 5.0f);
-		
-		return json;
-	}
-
-	JSONObject GetTestJSONRoundResult() {
-		JSONObject json = new JSONObject();
-		json.Add("result", ResultCodes.RESULT_OK_ROUND_RESULT);
-		json.Add("winner_id", "testuser" + Random.Range(1, 3));
-		json.Add("remain_round", 9);
-
-		return json;
-	}
+//	IEnumerator TestRoundWinner() {
+//		JSONObject jsonRoomState = new JSONObject();
+//		jsonRoomState.Add("result", 1015);
+//
+//		JSONObject jsonData = new JSONObject ();
+//		jsonData.Add ("room_id", 1);
+//		jsonRoomState.Add ("data", jsonData);
+//
+//		JSONArray userList = new JSONArray ();
+//		for (int i = 1; i <= 2; i ++) {
+//			JSONObject jsonUser = new JSONObject();
+//			jsonUser.Add("user_id", "testuser" + i);
+//			jsonUser.Add("character_type", i);
+//			jsonUser.Add("level", i * 3);
+//			userList.Add (jsonUser);
+//		}
+//		jsonData.Add ("user_list", userList);
+//
+//		SocketWrapper.Instance.messageQueue.AddLast (jsonRoomState.ToString());
+//		SocketWrapper.Instance.onMessageReceived ();
+//
+//		JSONObject jsonGameStart = new JSONObject ();
+//		jsonGameStart.Add ("result", ResultCodes.RESULT_OK_NOTIFYING_START_GAME);
+//		SocketWrapper.Instance.messageQueue.AddLast (jsonGameStart.ToString());
+//		SocketWrapper.Instance.onMessageReceived ();
+//
+//
+//		for( int i = 0; i < 5; i ++ ) {
+//			JSONObject json;
+//
+//
+//			json = GetTestJSONRoundStart();
+//			SocketWrapper.Instance.messageQueue.AddLast(json.ToString());
+//			SocketWrapper.Instance.onMessageReceived();
+//			yield return new WaitForSeconds(5.0f);
+//
+//
+//			json = GetTestJSONRoundResult();
+//			SocketWrapper.Instance.messageQueue.AddLast(json.ToString());
+//			SocketWrapper.Instance.onMessageReceived();
+//			yield return new WaitForSeconds(3.0f);
+//		}
+//	}
+//
+//	JSONObject GetTestJSONRoundStart() {
+//		JSONObject json = new JSONObject();
+//		json.Add("result", ResultCodes.RESULT_OK_MAKE_QUIZ);
+//		json.Add("quiz_string", "test test");
+//		json.Add("time", 5.0f);
+//		
+//		return json;
+//	}
+//
+//	JSONObject GetTestJSONRoundResult() {
+//		JSONObject json = new JSONObject();
+//		json.Add("result", ResultCodes.RESULT_OK_ROUND_RESULT);
+//		json.Add("winner_id", "testuser" + Random.Range(1, 3));
+//		json.Add("remain_round", 9);
+//
+//		return json;
+//	}
 
 	public override void OnMessageReceived() 
 	{
@@ -154,8 +152,6 @@ public class SceneControllerGame : SceneController {
 		json.Add ("target", ServerAPITargets.TARGET_GAME_START);
 		json.Add ("access_token", SocketWrapper.Instance.accessToken);
 		SocketWrapper.Instance.WriteSocket (json.ToString ());
-
-		StartCoroutine (TestRoundWinner ());
 	}
 
 	public void OnClickLeaveGame() {
@@ -207,7 +203,7 @@ public class SceneControllerGame : SceneController {
 	void UpdateQuiz(JSONObject json) {
 		LabelTitle.text = json.GetString ("quiz_string");
 
-		int time = (int)json.GetNumber ("time");
+		int time = (int)json.GetNumber ("time") / 1000;
 		StartCoroutine (TimerStart (time));
 	}
 
