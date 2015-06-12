@@ -4,6 +4,7 @@ using System.Net.Sockets;
 using System.IO;
 using System;
 using System.Collections.Generic;
+using System.Text;
 
 public class SocketWrapper : MonoBehaviour
 {
@@ -32,6 +33,8 @@ public class SocketWrapper : MonoBehaviour
 	String Host = "127.0.0.1";
 	Int32 Port = 10101;
 	internal Boolean socketReady = false;
+	StringBuilder stringBuilder;
+	char[] buffer;
 	
 	public string accessToken {
 		get;
@@ -55,6 +58,8 @@ public class SocketWrapper : MonoBehaviour
 
 	void Awake ()
 	{
+		stringBuilder = new StringBuilder ();
+		buffer = new char[1024];
 		messageQueue = new LinkedList<string> ();
 		SetUpSocket ();
 	}
@@ -62,9 +67,30 @@ public class SocketWrapper : MonoBehaviour
 	void Update ()
 	{
 		if (socketReady && theStream.DataAvailable) {
-			string read = ReadSocket ();
-			messageQueue.AddLast(read);
-			onMessageReceived();
+			ReadSocket ();
+		}
+
+		if (stringBuilder.Length > 0) {
+			string content = stringBuilder.ToString();
+			int index = content.IndexOf("\r\n");
+			if( index != -1 ) {
+				string line = content.Substring(0, index);
+				if( line.Length > 0 ) {
+					messageQueue.AddLast(line);
+					if( loggingRead ) {
+						print (line.Length + "\n" + line);
+					}
+				}
+
+				stringBuilder = new StringBuilder(content.Substring(index + 2));
+			}
+		}
+
+		int count = messageQueue.Count;
+		for (int i = 0; i < count; i ++) {
+			if( onMessageReceived != null ) {
+				onMessageReceived();
+			}
 		}
 	}
 
@@ -100,20 +126,19 @@ public class SocketWrapper : MonoBehaviour
 		theWriter.Flush ();
 	}
 
-	public String ReadSocket ()
+	public void ReadSocket ()
 	{
 		if (!socketReady) {
-			return "";
-		}
-		if (theStream.DataAvailable) {
-			string line = theReader.ReadLine ();
-			if( loggingRead ) {
-				print (line.Length + "\n" + line);
-			}
-			return line;
+			return;
 		}
 
-		return "";
+		if (theStream.DataAvailable) {
+			Array.Clear(buffer, 0, buffer.Length);
+			int readBytes = theReader.Read(buffer, 0, buffer.Length);
+			if( readBytes > 0 ) {
+				stringBuilder.Append(new string(buffer, 0, readBytes));
+			}
+		}
 	}
 
 	public void CloseSocket ()
