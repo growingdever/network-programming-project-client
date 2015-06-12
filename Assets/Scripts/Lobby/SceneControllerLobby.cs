@@ -22,6 +22,8 @@ public class SceneControllerLobby : SceneController {
 //		StartCoroutine (ChattingTest ());
 //		StartCoroutine (UpdateRoomListTest ());
 
+		SocketWrapper.Instance.loggingRead = true;
+
 		RequestCheckingLobby ();
 	}
 
@@ -59,8 +61,6 @@ public class SceneControllerLobby : SceneController {
 	public override void OnMessageReceived() 
 	{
 		JSONObject json = JSONObject.Parse (SocketWrapper.Instance.Pop ());
-		print (json);
-
 		if (!json.ContainsKey ("result")) {
 			return;
 		}

@@ -48,6 +48,11 @@ public class SocketWrapper : MonoBehaviour
 		set;
 	}
 
+	public bool loggingRead {
+		get;
+		set;
+	}
+
 	void Awake ()
 	{
 		messageQueue = new LinkedList<string> ();
@@ -101,7 +106,11 @@ public class SocketWrapper : MonoBehaviour
 			return "";
 		}
 		if (theStream.DataAvailable) {
-			return theReader.ReadLine ();
+			string line = theReader.ReadLine ();
+			if( loggingRead ) {
+				print (line.Length + "\n" + line);
+			}
+			return line;
 		}
 
 		return "";

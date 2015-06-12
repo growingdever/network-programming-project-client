@@ -96,7 +96,6 @@ public class SceneControllerGame : SceneController {
 	public override void OnMessageReceived() 
 	{
 		JSONObject json = JSONObject.Parse (SocketWrapper.Instance.Pop ());
-		print (json);
 		if (!json.ContainsKey ("result")) {
 			return;
 		}
