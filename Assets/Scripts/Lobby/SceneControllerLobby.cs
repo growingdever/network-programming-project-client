@@ -56,54 +56,14 @@ public class SceneControllerLobby : SceneController {
 		InputChattingMessage.value = "";
 	}
 
-	IEnumerator ChattingTest() {
-		for (int i = 0;; i ++) {
-			JSONObject json = new JSONObject ();
-			json.Add ("result", ResultCodes.RESULT_OK_CHAT_MESSAGE);
-			
-			JSONObject jsonMessage = new JSONObject ();
-			jsonMessage.Add ("sender_id", "testuser1");
-			jsonMessage.Add ("content", string.Format("hello world {0}", i));
-			json.Add("message", jsonMessage);
-			
-			SocketWrapper.Instance.messageQueue.AddLast (json.ToString());
-			SocketWrapper.Instance.onMessageReceived();
-
-			yield return new WaitForSeconds(2.0f);
-		}
-	}
-
-	IEnumerator UpdateRoomListTest() {
-		while (true) {
-			JSONObject json = new JSONObject();
-			json.Add("result", ResultCodes.RESULT_OK_STATE_LOBBY);
-
-			JSONObject jsonData = new JSONObject();
-			json.Add("data", jsonData);
-
-			JSONArray roomList = new JSONArray();
-			for( int i = 1; i < 4; i ++ ) {
-				JSONObject jsonRoom = new JSONObject();
-				jsonRoom.Add("room_id", i);
-				jsonRoom.Add("title", string.Format("title {0}", i));
-				jsonRoom.Add("num_of_member", "1/4");
-				jsonRoom.Add("state", 0);
-				roomList.Add(jsonRoom);
-			}
-			jsonData.Add("room_list", roomList);
-
-			SocketWrapper.Instance.messageQueue.AddLast(json.ToString());
-			yield return new WaitForSeconds(5.0f);
-		}
-	}
-
 	public override void OnMessageReceived() 
 	{
 		JSONObject json = JSONObject.Parse (SocketWrapper.Instance.Pop ());
+		print (json);
+
 		if (!json.ContainsKey ("result")) {
 			return;
 		}
-		print (json);
 
 		int resultCode = (int)json.GetNumber ("result");
 		if (resultCode == ResultCodes.RESULT_OK_CHAT_MESSAGE) {
@@ -113,11 +73,12 @@ public class SceneControllerLobby : SceneController {
 			}
 		} else if (resultCode == ResultCodes.RESULT_OK_STATE_LOBBY) {
 			JSONObject jsonData = json.GetObject ("data");
-			UpdateLobby(jsonData);
+			UpdateLobby (jsonData);
 		} else if (resultCode == ResultCodes.RESULT_OK_JOIN_ROOM) {
 			Application.LoadLevel ("game");
 		} else if (resultCode == ResultCodes.RESULT_OK_CREATE_ROOM) {
-			Application.LoadLevel ("game");
+		} else if (resultCode == ResultCodes.RESULT_OK_REQUEST_LOBBY_UPDATE) {
+			RequestCheckingLobby();
 		}
 	}
 

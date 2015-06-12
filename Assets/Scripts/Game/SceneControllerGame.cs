@@ -234,6 +234,8 @@ public class SceneControllerGame : SceneController {
 		LabelTimer.GetComponent<Animator> ().Play ("TimerDismiss");
 
 		StartCoroutine (InitTitleWithDelay (3.0f));
+
+		SendRequestRoomMemberUpdate ();
 	}
 
 	IEnumerator InitTitleWithDelay(float delay) {
