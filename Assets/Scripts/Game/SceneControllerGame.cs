@@ -166,6 +166,7 @@ public class SceneControllerGame : SceneController {
 
 		LabelTitle.text = "Game is starting soon!";
 		LabelTimer.GetComponent<Animator> ().Play ("TimerShow");
+		LabelTimer.text = "00";
 	}
 
 	void LeaveGameRoom() {
