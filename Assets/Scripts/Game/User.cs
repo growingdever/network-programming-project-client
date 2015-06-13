@@ -15,7 +15,7 @@ public class User : MonoBehaviour {
 
 	public void Init(JSONObject json) {
 		userID = json.GetString ("user_id");
-		int characterType = (int)json.GetNumber ("character_type") + 1;
+		int characterType = (int)json.GetNumber ("character_type");
 		int level = (int)json.GetNumber ("exp") / 300;
 
 		LabelUserID.text = string.Format ("Lv.{0} {1}", level, userID);
