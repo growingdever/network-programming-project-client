@@ -128,9 +128,6 @@ public class SceneControllerGame : SceneController {
 		case ResultCodes.RESULT_OK_LEAVE_ROOM:
 			LeaveGameRoom();
 			break;
-		case ResultCodes.RESULT_OK_REQUEST_LOBBY_UPDATE:
-			SocketWrapper.Instance.onMessageReceived = null;
-			break;
 		case ResultCodes.RESULT_ERROR_INVALID_CONNECTION:
 		default:
 			Application.LoadLevel("login");
@@ -173,6 +170,8 @@ public class SceneControllerGame : SceneController {
 	}
 
 	void LeaveGameRoom() {
+		SocketWrapper.Instance.onMessageReceived = null;
+
 		ButtonStartGame.GetComponent<Animator> ().Play ("Dismiss");
 		ButtonLeaveGame.GetComponent<Animator> ().Play ("Dismiss");
 		Invoke ("LeaveGameRoom2", 1.5f);

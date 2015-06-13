@@ -30,8 +30,8 @@ public class SocketWrapper : MonoBehaviour
 	NetworkStream theStream;
 	StreamWriter theWriter;
 	StreamReader theReader;
-	String Host = "127.0.0.1";
-	Int32 Port = 10101;
+	String Host;
+	Int32 Port;
 	internal Boolean socketReady = false;
 	StringBuilder stringBuilder;
 	char[] buffer;
@@ -107,6 +107,22 @@ public class SocketWrapper : MonoBehaviour
 
 	void SetUpSocket ()
 	{
+		string hostFilePath = "";
+		if (Application.platform == RuntimePlatform.OSXPlayer || Application.platform == RuntimePlatform.OSXEditor) {
+			hostFilePath = "/Users/loki/hosts";
+		} else if (Application.platform == RuntimePlatform.WindowsPlayer) {
+			hostFilePath = "C:\\hosts";
+		} else if (Application.platform == RuntimePlatform.LinuxPlayer) {
+			hostFilePath = "/Users/loki/hosts";
+		}
+
+		StreamReader fileReader = new StreamReader( File.Open (hostFilePath, FileMode.Open) );
+		string content = fileReader.ReadToEnd();
+		string[] stringSeparators = new string[] {" "};
+		string[] strings = content.Split(stringSeparators, StringSplitOptions.None);
+		Host = strings[0];
+		Port = int.Parse(strings[1]);
+
 		try {
 			mySocket = new TcpClient (Host, Port);
 			theStream = mySocket.GetStream ();
