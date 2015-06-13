@@ -76,7 +76,12 @@ public class SocketWrapper : MonoBehaviour
 			if( index != -1 ) {
 				string line = content.Substring(0, index);
 				if( line.Length > 0 ) {
-					messageQueue.AddLast(line);
+					if( line == "ping" ) {
+						WriteSocket("pong");
+					} else {
+						messageQueue.AddLast(line);
+					}
+
 					if( loggingRead ) {
 						print (line.Length + "\n" + line);
 					}
