@@ -79,11 +79,11 @@ public class SocketWrapper : MonoBehaviour
 					if( line == "ping" ) {
 						WriteSocket("pong");
 					} else {
-						messageQueue.AddLast(line);
-					}
+						if( loggingRead ) {
+							print (line.Length + "\n" + line);
+						}
 
-					if( loggingRead ) {
-						print (line.Length + "\n" + line);
+						messageQueue.AddLast(line);
 					}
 				}
 
@@ -107,15 +107,7 @@ public class SocketWrapper : MonoBehaviour
 
 	void SetUpSocket ()
 	{
-		string hostFilePath = "";
-		if (Application.platform == RuntimePlatform.OSXPlayer || Application.platform == RuntimePlatform.OSXEditor) {
-			hostFilePath = "/Users/loki/hosts";
-		} else if (Application.platform == RuntimePlatform.WindowsPlayer) {
-			hostFilePath = "C:\\hosts";
-		} else if (Application.platform == RuntimePlatform.LinuxPlayer) {
-			hostFilePath = "/Users/loki/hosts";
-		}
-
+		string hostFilePath = Environment.CurrentDirectory + "/hosts";
 		StreamReader fileReader = new StreamReader( File.Open (hostFilePath, FileMode.Open) );
 		string content = fileReader.ReadToEnd();
 		string[] stringSeparators = new string[] {" "};

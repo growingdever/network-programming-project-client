@@ -17,6 +17,8 @@ public class SceneControllerSignUp : SceneController {
 	public override void Start ()
 	{
 		base.Start ();
+
+		characterType = 1;
 	}
 
 	public void OnClickSignUp() 
