@@ -31,6 +31,11 @@ public class SceneControllerSignUp : SceneController {
 		SocketWrapper.Instance.WriteSocket (json.ToString());
 	}
 
+	public void OnClickBack() 
+	{
+		Application.LoadLevel ("login");
+	}
+
 	public override void OnMessageReceived() 
 	{
 		string result = SocketWrapper.Instance.Pop ();
